@@ -66,10 +66,10 @@ public class MortalityRateService implements IService<MortalityRate, Long> {
     }
 
     public void saveAllRecords(List<MortalityRate> records) {
-        records.forEach(record -> {
+        /*records.forEach(record -> {
             record.setMalePopulation(getPopulationData(record.getCountry(), "male"));
             record.setFemalePopulation(getPopulationData(record.getCountry(), "female"));
-        });
+        });*/
         repository.saveAll(records);
     }
 

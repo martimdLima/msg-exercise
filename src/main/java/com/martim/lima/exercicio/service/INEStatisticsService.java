@@ -3,12 +3,15 @@ package com.martim.lima.exercicio.service;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutionException;
 
 @Service
 public class INEStatisticsService implements ExternalPopulationDataService {
@@ -20,29 +23,79 @@ public class INEStatisticsService implements ExternalPopulationDataService {
 
     @Override
     public Map<String, Map<String, Long>> getPopulationDataForYear(int year) {
-        Map<String, Map<String, Long>> result =  new HashMap<>();
-        result.put("PT", getPopulationForYear(year));
-        return result;
+        Map<String, Long> subResult =  new HashMap<>();
+        subResult.put("M", 0L);
+        subResult.put("F", 1L);
+        Map<String, Map<String, Long>> result = new HashMap<>();
+        try {
+            result.put("PT", this.getPopulationForYearAsync(year).get());
+            return result;
+        } catch (InterruptedException | ExecutionException e) {
+            e.printStackTrace();
+            // Rethrow the exception to propagate it
+            //throw e;
+
+            result.put("PT", subResult);
+            return result;
+        }
     }
 
     @Override
     public Map<String, Long> getPopulationDataByCountry(int year, String country) {
-        return getPopulationForYear(year);
+        Map<String, Long> result =  new HashMap<>();
+        result.put("M", 0L);
+        result.put("F", 1L);
+        try {
+            return this.getPopulationForYearAsync(year).get();
+        } catch (InterruptedException | ExecutionException e) {
+            e.printStackTrace();
+            // Rethrow the exception to propagate it
+            //throw e;
+        }
+        return result;
     }
 
     @Override
     public Map<String, Long> getPopulationDataByGender(int year, String gender) {
-        Map <String, Long> result = new HashMap<>();
-        result.put(gender, getPopulationForYearAndGender(year, gender));
+
+        Map<String, Long> result =  new HashMap<>();
+        try {
+            result.put("PT", this.getPopulationForYearAndGenderAsync(year, gender).get());
+            return result;
+        } catch (InterruptedException | ExecutionException e) {
+            e.printStackTrace();
+            // Rethrow the exception to propagate it
+            //throw e;
+        }
+        result.put("PT", 0L);
         return result;
     }
     @Override
     public Long getPopulationData(int year, String country, String gender) {
-        return getPopulationForYearAndGender(year, gender);
+        Long result = 0L;
+        try {
+            return this.getPopulationForYearAndGenderAsync(year, gender).get();
+        } catch (InterruptedException | ExecutionException e) {
+            e.printStackTrace();
+            // Rethrow the exception to propagate it
+            //throw e;
+        }
+        return result;
     }
 
     public Map<String, Long> getMaleAndFemalePopulation(int year) {
-        return getPopulationForYear(year);
+        Map<String, Long> result = new HashMap<>();
+        result.put("M", 0L);
+        result.put("F", 1L);
+        try {
+            return this.getPopulationForYearAsync(year).get();
+        } catch (InterruptedException | ExecutionException e) {
+            e.printStackTrace();
+
+            // Rethrow the exception to propagate it
+            //throw e;
+            return result;
+        }
     }
 
     private String buildUrl(String year, String gender) {
@@ -75,6 +128,50 @@ public class INEStatisticsService implements ExternalPopulationDataService {
         };
 
         return INE_API_URL + "&varcd=0012903&Dim2=PT&Dim3=" + gender_query_paramter + "&Dim1=S7A" + year +  "&lang=EN&Dim4=T";
+    }
+
+    @Async
+    private CompletableFuture<Map<String, Long>> getPopulationForYearAsync(int year) {
+        String url = genINEApiUrl(year, "");
+        String response = restTemplate.getForObject(url, String.class);
+        Map<String, Long> pops = new HashMap<>();
+        try {
+            ObjectMapper objectMapper = new ObjectMapper();
+            JsonNode rootNode = objectMapper.readTree(response);
+            JsonNode dataNode = rootNode.path(0).path("Dados").path(""+year);
+            for (JsonNode entry : dataNode) {
+                if (entry.path("dim_3_t").asText().equals("M")) {
+                    pops.put("M", entry.path("valor").asLong());
+                } else if (entry.path("dim_3_t").asText().equals("F")) {
+                    pops.put("F", entry.path("valor").asLong());
+                } else {
+                    pops.put("MF", entry.path("valor").asLong());
+                }
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return CompletableFuture.completedFuture(pops);
+    }
+
+    private CompletableFuture<Long> getPopulationForYearAndGenderAsync(int year, String gender) {
+        String url = genINEApiUrl(year, gender);
+        String response = restTemplate.getForObject(url, String.class);
+
+        try {
+            ObjectMapper objectMapper = new ObjectMapper();
+            JsonNode rootNode = objectMapper.readTree(response);
+            JsonNode dataNode = rootNode.path(0).path("Dados").path(year);
+
+            for (JsonNode entry : dataNode) {
+                if (entry.path("dim_3_t").asText().equals(gender)) {
+                    return CompletableFuture.completedFuture(entry.path("valor").asLong());
+                }
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return CompletableFuture.completedFuture(0L);
     }
 
     private Map<String, Long> getPopulationForYear(int year) {

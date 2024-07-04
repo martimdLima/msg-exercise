@@ -69,18 +69,23 @@ public class MortalityRateController {
         try (BufferedReader reader = new BufferedReader(new InputStreamReader(file.getInputStream()))) {
             String line;
             List<MortalityRate> records = new ArrayList<>();
+            int counter = 0;
             while ((line = reader.readLine()) != null) {
                 String[] data = line.split(";");
-                if (data.length == 3) {
+                if (data.length == 3 && counter >= 1) {
                     String country = isValidCountryCode(data[0]) ? data[0] : getCountryCode(data[0]);
-                    MortalityRate record = MortalityRate.builder()
+                    Map<String, Long> populationNumbers = ineStatisticsService.getMaleAndFemalePopulation(year);
+                    MortalityRate mRateRecord = MortalityRate.builder()
                             .year(year)
                             .country(country)
                             .femaleRate(Double.parseDouble(data[2]))
                             .maleRate(Double.parseDouble(data[1]))
+                            .malePopulation(populationNumbers.get("M"))
+                            .femalePopulation(populationNumbers.get("F"))
                             .build();
-                    records.add(record);
+                    records.add(mRateRecord);
                 }
+                counter++;
             }
             mortalityRateService.deleteRecordsByYear(year);
             mortalityRateService.saveAllRecords(records);
