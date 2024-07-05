@@ -1,8 +1,5 @@
 <template>
   <div id="app">
-    <header>
-      <h1>Mortality Table Viewer</h1>
-    </header>
     <main>
       <MortalityTable />
     </main>
