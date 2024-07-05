@@ -11,6 +11,7 @@ import java.util.List;
 public interface MortalityRateRepository extends JpaRepository<MortalityRate, Long> {
 
     List<MortalityRate> findByYear(int year);
+    List<MortalityRate> findByCountry(String country);
     MortalityRate findByYearAndCountry(int year, String country);
     @Query("SELECT DISTINCT m.year FROM MortalityRate m ORDER BY m.year ASC")
     List<Integer> findDistinctYears();

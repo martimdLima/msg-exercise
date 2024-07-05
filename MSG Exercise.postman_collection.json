@@ -1,0 +1,687 @@
+{
+	"info": {
+		"_postman_id": "8cd2e9cc-0018-40a2-960c-ceaec920c9e2",
+		"name": "MSG Exercise",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "8401442"
+	},
+	"item": [
+		{
+			"name": "CRUD",
+			"item": [
+				{
+					"name": "Find By Year",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Response status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"",
+									"pm.test(\"Response has the required fields\", function () {",
+									"    const responseData = pm.response.json();",
+									"    ",
+									"    pm.expect(responseData).to.be.an('array');",
+									"    ",
+									"    responseData.forEach(function(entry) {",
+									"        pm.expect(entry).to.include.all.keys('id', 'year', 'country', 'femaleRate', 'maleRate', 'malePopulation', 'femalePopulation', 'createdAt', 'updatedAt');",
+									"    });",
+									"});",
+									"",
+									"",
+									"pm.test(\"Year is a non-zero integer\", function () {",
+									"  const responseData = pm.response.json();",
+									"  ",
+									"  pm.expect(responseData).to.be.an('array');",
+									"  responseData.forEach(function(entry) {",
+									"    pm.expect(entry.year).to.be.a('number').and.to.not.equal(0);",
+									"  });",
+									"});",
+									"",
+									"",
+									"pm.test(\"Country is a non-empty string\", function () {",
+									"  const responseData = pm.response.json();",
+									"  ",
+									"  pm.expect(responseData).to.be.an('array');",
+									"  responseData.forEach(function(entry) {",
+									"    pm.expect(entry.country).to.be.a('string').and.to.have.lengthOf.at.least(1, \"Country should not be empty\");",
+									"  });",
+									"});",
+									"",
+									"",
+									"pm.test(\"Male population and female population are non-negative integers\", function () {",
+									"    const responseData = pm.response.json();",
+									"    ",
+									"    pm.expect(responseData).to.be.an('array');",
+									"    responseData.forEach(function(entry) {",
+									"        pm.expect(entry.malePopulation).to.be.a('number').and.to.be.at.least(0);",
+									"        pm.expect(entry.femalePopulation).to.be.a('number').and.to.be.at.least(0);",
+									"    });",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "localhost:8080/api/mortality/search/year/2023",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"mortality",
+								"search",
+								"year",
+								"2023"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Find By Country",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Response status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"",
+									"pm.test(\"Response has the required fields\", function () {",
+									"    const responseData = pm.response.json();",
+									"    ",
+									"    pm.expect(responseData).to.be.an('array');",
+									"    ",
+									"    responseData.forEach(function(entry) {",
+									"        pm.expect(entry).to.include.all.keys('id', 'year', 'country', 'femaleRate', 'maleRate', 'malePopulation', 'femalePopulation', 'createdAt', 'updatedAt');",
+									"    });",
+									"});",
+									"",
+									"",
+									"pm.test(\"Year is a non-zero integer\", function () {",
+									"  const responseData = pm.response.json();",
+									"  ",
+									"  pm.expect(responseData).to.be.an('array');",
+									"  responseData.forEach(function(entry) {",
+									"    pm.expect(entry.year).to.be.a('number').and.to.not.equal(0);",
+									"  });",
+									"});",
+									"",
+									"",
+									"pm.test(\"Country is a non-empty string\", function () {",
+									"  const responseData = pm.response.json();",
+									"  ",
+									"  pm.expect(responseData).to.be.an('array');",
+									"  responseData.forEach(function(entry) {",
+									"    pm.expect(entry.country).to.be.a('string').and.to.have.lengthOf.at.least(1, \"Country should not be empty\");",
+									"  });",
+									"});",
+									"",
+									"",
+									"pm.test(\"Male population and female population are non-negative integers\", function () {",
+									"    const responseData = pm.response.json();",
+									"    ",
+									"    pm.expect(responseData).to.be.an('array');",
+									"    responseData.forEach(function(entry) {",
+									"        pm.expect(entry.malePopulation).to.be.a('number').and.to.be.at.least(0);",
+									"        pm.expect(entry.femalePopulation).to.be.a('number').and.to.be.at.least(0);",
+									"    });",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "localhost:8080/api/mortality/search/country/PT",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"mortality",
+								"search",
+								"country",
+								"PT"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Find By ID",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Response status code is 200\", function () {",
+									"    pm.expect(pm.response.code).to.equal(200);",
+									"});",
+									"",
+									"",
+									"pm.test(\"Response has the required fields\", function () {",
+									"    const responseData = pm.response.json();",
+									"",
+									"    pm.expect(responseData).to.be.an('object');",
+									"    pm.expect(responseData).to.have.property('id');",
+									"    pm.expect(responseData).to.have.property('year');",
+									"    pm.expect(responseData).to.have.property('country');",
+									"    pm.expect(responseData).to.have.property('femaleRate');",
+									"    pm.expect(responseData).to.have.property('maleRate');",
+									"    pm.expect(responseData).to.have.property('malePopulation');",
+									"    pm.expect(responseData).to.have.property('femalePopulation');",
+									"    pm.expect(responseData).to.have.property('createdAt');",
+									"    pm.expect(responseData).to.have.property('updatedAt');",
+									"});",
+									"",
+									"",
+									"pm.test(\"Year is a valid non-negative integer\", function () {",
+									"    const responseData = pm.response.json();",
+									"",
+									"    pm.expect(responseData).to.be.an('object');",
+									"    pm.expect(responseData.year).to.be.a('number').and.to.satisfy((year) => year >= 0, \"Year must be a non-negative integer\");",
+									"});",
+									"",
+									"",
+									"pm.test(\"Country is a non-empty string\", function () {",
+									"  const responseData = pm.response.json();",
+									"  ",
+									"  pm.expect(responseData).to.be.an('object');",
+									"  pm.expect(responseData.country).to.be.a('string').and.to.have.lengthOf.at.least(1, \"Country should not be empty\");",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "localhost:8080/api/mortality/search/id/114",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"mortality",
+								"search",
+								"id",
+								"114"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Find By Year And Country",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Response status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"",
+									"pm.test(\"Response has the required fields\", function () {",
+									"    const responseData = pm.response.json();",
+									"    ",
+									"    pm.expect(responseData).to.have.property('id');",
+									"    pm.expect(responseData).to.have.property('year');",
+									"    pm.expect(responseData).to.have.property('country');",
+									"    pm.expect(responseData).to.have.property('femaleRate');",
+									"    pm.expect(responseData).to.have.property('maleRate');",
+									"    pm.expect(responseData).to.have.property('malePopulation');",
+									"    pm.expect(responseData).to.have.property('femalePopulation');",
+									"    pm.expect(responseData).to.have.property('createdAt');",
+									"    pm.expect(responseData).to.have.property('updatedAt');",
+									"});",
+									"",
+									"",
+									"pm.test(\"FemaleRate and maleRate are within the valid range\", function () {",
+									"    const responseData = pm.response.json();",
+									"    ",
+									"    pm.expect(responseData).to.be.an('object');",
+									"    pm.expect(responseData.femaleRate).to.be.a('number').and.to.be.at.least(0).and.to.be.at.most(100);",
+									"    pm.expect(responseData.maleRate).to.be.a('number').and.to.be.at.least(0).and.to.be.at.most(100);",
+									"});",
+									"",
+									"",
+									"pm.test(\"MalePopulation is a non-negative integer\", function () {",
+									"    const responseData = pm.response.json();",
+									"    pm.expect(responseData.malePopulation).to.be.a('number');",
+									"    pm.expect(responseData.malePopulation).to.be.at.least(0);",
+									"});",
+									"",
+									"pm.test(\"FemalePopulation is a non-negative integer\", function () {",
+									"    const responseData = pm.response.json();",
+									"    pm.expect(responseData.femalePopulation).to.be.a('number');",
+									"    pm.expect(responseData.femalePopulation).to.be.at.least(0);",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "localhost:8080/api/mortality/search/year/2023/country/PT",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"mortality",
+								"search",
+								"year",
+								"2023",
+								"country",
+								"PT"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Create",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Response status code is 201\", function () {",
+									"  pm.expect(pm.response.code).to.equal(201);",
+									"});",
+									"",
+									"",
+									"pm.test(\"Response has the required fields\", function () {",
+									"    const responseData = pm.response.json();",
+									"    ",
+									"    pm.expect(responseData).to.be.an('object');",
+									"    pm.expect(responseData).to.have.property('id');",
+									"    pm.expect(responseData).to.have.property('year');",
+									"    pm.expect(responseData).to.have.property('country');",
+									"    pm.expect(responseData).to.have.property('femaleRate');",
+									"    pm.expect(responseData).to.have.property('maleRate');",
+									"    pm.expect(responseData).to.have.property('malePopulation');",
+									"    pm.expect(responseData).to.have.property('femalePopulation');",
+									"    pm.expect(responseData).to.have.property('createdAt');",
+									"    pm.expect(responseData).to.have.property('updatedAt');",
+									"});",
+									"",
+									"",
+									"pm.test(\"Year is a non-negative integer\", function () {",
+									"    const responseData = pm.response.json();",
+									"    ",
+									"    pm.expect(responseData).to.be.an('object');",
+									"    pm.expect(responseData.year).to.be.a('number').and.to.satisfy((year) => year >= 0, \"Year must be a non-negative integer\");",
+									"});",
+									"",
+									"",
+									"pm.test(\"Female rate is in valid percentage format\", function () {",
+									"    const responseData = pm.response.json();",
+									"    ",
+									"    pm.expect(responseData).to.be.an('object');",
+									"    pm.expect(responseData.femaleRate).to.match(/^\\d+\\.\\d{1,2}$/, \"Female rate should be in valid percentage format\");",
+									"});",
+									"",
+									"pm.test(\"Male rate is in valid percentage format\", function () {",
+									"    const responseData = pm.response.json();",
+									"    ",
+									"    pm.expect(responseData).to.be.an('object');",
+									"    pm.expect(responseData.maleRate).to.match(/^\\d+\\.\\d{1,2}$/, \"Male rate should be in valid percentage format\");",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"year\": 2018,\r\n  \"country\": \"ZB\",\r\n  \"maleRate\": 17.60,\r\n  \"femaleRate\": 16.30\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "localhost:8080/api/mortality/save",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"mortality",
+								"save"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Update",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Response status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"",
+									"pm.test(\"Response has the required fields\", function () {",
+									"  const responseData = pm.response.json();",
+									"  ",
+									"  pm.expect(responseData).to.be.an('object');",
+									"  pm.expect(responseData).to.have.property('id');",
+									"  pm.expect(responseData).to.have.property('year');",
+									"  pm.expect(responseData).to.have.property('country');",
+									"  pm.expect(responseData).to.have.property('femaleRate');",
+									"  pm.expect(responseData).to.have.property('maleRate');",
+									"  pm.expect(responseData).to.have.property('malePopulation');",
+									"  pm.expect(responseData).to.have.property('femalePopulation');",
+									"  pm.expect(responseData).to.have.property('createdAt');",
+									"  pm.expect(responseData).to.have.property('updatedAt');",
+									"});",
+									"",
+									"",
+									"pm.test(\"Year is a non-negative integer\", function () {",
+									"  const responseData = pm.response.json();",
+									"  ",
+									"  pm.expect(responseData).to.be.an('object');",
+									"  pm.expect(responseData.year).to.be.a('number').and.to.be.at.least(0, \"Year should be a non-negative integer\");",
+									"});",
+									"",
+									"",
+									"pm.test(\"Country is a non-empty string\", function () {",
+									"  const responseData = pm.response.json();",
+									"  ",
+									"  pm.expect(responseData).to.be.an('object');",
+									"  pm.expect(responseData.country).to.be.a('string').and.to.have.lengthOf.at.least(1, \"Country should not be empty\");",
+									"});",
+									"",
+									"",
+									"pm.test(\"Female rate is within valid range\", function () {",
+									"  const responseData = pm.response.json();",
+									"  ",
+									"  pm.expect(responseData).to.be.an('object');",
+									"  pm.expect(responseData.femaleRate).to.be.a('number');",
+									"  pm.expect(responseData.femaleRate).to.be.at.least(0);",
+									"  pm.expect(responseData.femaleRate).to.be.at.most(100);",
+									"});",
+									"",
+									"pm.test(\"Male rate is within valid range\", function () {",
+									"  const responseData = pm.response.json();",
+									"  ",
+									"  pm.expect(responseData).to.be.an('object');",
+									"  pm.expect(responseData.maleRate).to.be.a('number');",
+									"  pm.expect(responseData.maleRate).to.be.at.least(0);",
+									"  pm.expect(responseData.maleRate).to.be.at.most(100);",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "PATCH",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"id\": 114,\r\n  \"year\": 2022,\r\n  \"country\": \"PT\",\r\n  \"femaleRate\": 8.3,\r\n  \"maleRate\": 15.6\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "localhost:8080/api/mortality/update",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"mortality",
+								"update"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "CSV",
+			"item": [
+				{
+					"name": "Upload CSV",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "year",
+									"value": "2023",
+									"type": "text"
+								},
+								{
+									"key": "file",
+									"type": "file",
+									"src": "postman-cloud:///1ef3ab87-9369-4b30-9ad7-587205ba104d"
+								}
+							]
+						},
+						"url": {
+							"raw": "localhost:8080/api/mortality/upload",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"mortality",
+								"upload"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "External APIS",
+			"item": [
+				{
+					"name": "Get INE Deaths per year",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Response status code is 200\", function () {",
+									"  pm.expect(pm.response.code).to.equal(200);",
+									"});",
+									"",
+									"",
+									"pm.test(\"Content type is application/json\", function () {",
+									"    pm.expect(pm.response.headers.get(\"Content-Type\")).to.include(\"application/json\");",
+									"});",
+									"",
+									"",
+									"pm.test(\"Validate the structure of the Dados object\", function () {",
+									"  const responseData = pm.response.json();",
+									"  ",
+									"  pm.expect(responseData).to.be.an('array');",
+									"  responseData.forEach(function(item) {",
+									"    pm.expect(item).to.have.property('Dados');",
+									"    pm.expect(item.Dados).to.be.an('object');",
+									"  });",
+									"});",
+									"",
+									"",
+									"pm.test(\"Sucesso object is present and contains a non-empty Msg array\", function () {",
+									"    const responseData = pm.response.json();",
+									"",
+									"    pm.expect(responseData).to.be.an('array');",
+									"    pm.expect(responseData[0].Sucesso).to.exist.and.to.be.an('object');",
+									"    pm.expect(responseData[0].Sucesso.Verdadeiro).to.exist.and.to.be.an('array');",
+									"    responseData[0].Sucesso.Verdadeiro.forEach(function (item) {",
+									"        pm.expect(item.Msg).to.exist.and.to.be.a('string').and.to.have.lengthOf.at.least(1, \"Msg should not be empty\");",
+									"    });",
+									"});",
+									"",
+									"",
+									"pm.test(\"DataExtracao and DataUltimoAtualizacao have valid format\", function () {",
+									"  const responseData = pm.response.json();",
+									"  ",
+									"  pm.expect(responseData).to.be.an('array').that.is.not.empty;",
+									"  responseData.forEach(function (item) {",
+									"    pm.expect(item.DataExtracao).to.match(/^\\d{4}-\\d{2}-\\d{2}$/);",
+									"    pm.expect(item.DataUltimoAtualizacao).to.match(/^\\d{4}-\\d{2}-\\d{2}$/);",
+									"  });",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "https://www.ine.pt/ine/json_indicador/pindica.jsp?op=2&varcd=0008235&Dim2=T&Dim3=T&Dim1=S7A2023&lang=EN",
+							"protocol": "https",
+							"host": [
+								"www",
+								"ine",
+								"pt"
+							],
+							"path": [
+								"ine",
+								"json_indicador",
+								"pindica.jsp"
+							],
+							"query": [
+								{
+									"key": "op",
+									"value": "2"
+								},
+								{
+									"key": "varcd",
+									"value": "0008235"
+								},
+								{
+									"key": "Dim2",
+									"value": "T"
+								},
+								{
+									"key": "Dim3",
+									"value": "T"
+								},
+								{
+									"key": "Dim1",
+									"value": "S7A2023"
+								},
+								{
+									"key": "lang",
+									"value": "EN"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "INE Indicators",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "https://www.ine.pt/ine/json_indicador/pindicaMeta.jsp?varcd=0008235&lang=EN",
+							"protocol": "https",
+							"host": [
+								"www",
+								"ine",
+								"pt"
+							],
+							"path": [
+								"ine",
+								"json_indicador",
+								"pindicaMeta.jsp"
+							],
+							"query": [
+								{
+									"key": "varcd",
+									"value": "0008235"
+								},
+								{
+									"key": "lang",
+									"value": "EN"
+								}
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "API Health Check",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "localhost:8080/api/mortality/health",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"api",
+						"mortality",
+						"health"
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}

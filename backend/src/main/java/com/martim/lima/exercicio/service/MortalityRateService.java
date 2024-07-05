@@ -1,5 +1,6 @@
 package com.martim.lima.exercicio.service;
 
+import com.martim.lima.exercicio.exceptions.ResourceAlreadyExistsException;
 import com.martim.lima.exercicio.exceptions.ResourceNotFoundException;
 import com.martim.lima.exercicio.models.MortalityRate;
 import com.martim.lima.exercicio.repository.MortalityRateRepository;
@@ -22,12 +23,8 @@ public class MortalityRateService implements GenericServiceInterface<MortalityRa
     @Override
     public MortalityRate findById(Long id) {
         Optional<MortalityRate> mortalityRateOpt = repository.findById(id);
+        return mortalityRateOpt.orElse(null);
 
-        if (mortalityRateOpt.isEmpty()) {
-            throw new ResourceNotFoundException("Mortality Rate not found with id: " + id);
-        }
-
-        return mortalityRateOpt.get();
     }
 
     public List<MortalityRate> findByYear(int year) {
@@ -36,7 +33,15 @@ public class MortalityRateService implements GenericServiceInterface<MortalityRa
             throw new ResourceNotFoundException("No Mortality Rates found for year: " + year);
         }
 
-        return repository.findByYear(year);
+        return mortalityRates;
+    }
+    public List<MortalityRate> findByCountry(String country) {
+        List<MortalityRate> mortalityRates = repository.findByCountry(country);
+        if (mortalityRates.isEmpty()) {
+            throw new ResourceNotFoundException("No Mortality Rates found for country: " + country);
+        }
+
+        return mortalityRates;
     }
 
     public MortalityRate findByYearAndCountry(int year, String country) {
@@ -46,16 +51,28 @@ public class MortalityRateService implements GenericServiceInterface<MortalityRa
             throw new ResourceNotFoundException("No Mortality Rate found for year: " + year + " and country: " + country);
         }
 
-        return repository.findByYearAndCountry(year, country);
+        return mortalityRate;
     }
 
     @Override
-    public MortalityRate save(MortalityRate mRateRecords) {
-        return repository.save(mRateRecords);
+    public MortalityRate save(MortalityRate mRateRecord) {
+
+        MortalityRate mortalityRate = repository.findByYearAndCountry(mRateRecord.getYear(), mRateRecord.getCountry());
+
+        if (mortalityRate != null) {
+            throw new ResourceAlreadyExistsException("Mortality Rate for: " + mRateRecord.getYear() + " and " +
+                    "country: " + mRateRecord.getCountry() + " already exits");
+        }
+
+        return repository.save(mRateRecord);
     }
 
     @Override
     public List<MortalityRate> saveAll(List<MortalityRate> records) {
+        records.stream().filter(mortalityRate -> repository.findByYearAndCountry(mortalityRate.getYear(), mortalityRate.getCountry()) != null).forEach(mortalityRate -> {
+            throw new ResourceAlreadyExistsException("Mortality Rate for: " + mortalityRate.getYear() + " and " +
+                    "country: " + mortalityRate.getCountry() + " already exits");
+        });
         repository.saveAll(records);
         return records;
     }
@@ -63,6 +80,11 @@ public class MortalityRateService implements GenericServiceInterface<MortalityRa
     @Override
     public MortalityRate update(MortalityRate mRate) {
         MortalityRate existingMRate = this.findById(mRate.getId());
+
+        if (existingMRate == null) {
+            throw new ResourceNotFoundException("Mortality Rate with id: " + mRate.getId() + " was not found");
+        }
+
         existingMRate.setYear(mRate.getYear());
         existingMRate.setCountry(mRate.getCountry());
         existingMRate.setMaleRate(mRate.getMaleRate());
@@ -72,26 +94,35 @@ public class MortalityRateService implements GenericServiceInterface<MortalityRa
     }
     @Override
     public void delete(Long id) {
-        Optional<MortalityRate> mortalityRateOpt = repository.findById(id);
+        MortalityRate existingMRate = this.findById(id);
 
-        if (mortalityRateOpt.isEmpty()) {
-            throw new ResourceNotFoundException("No Mortality Rate found for id: " + id);
+        if (existingMRate == null) {
+            throw new ResourceNotFoundException("Mortality Rate with id: " + id + " was not found");
         }
 
-        repository.delete(mortalityRateOpt.get());
+        repository.delete(existingMRate);
     }
 
     @Override
     public void deleteAll(List<MortalityRate> records) {
+
+        records.forEach(mortalityRate -> {
+            MortalityRate existingMRate = this.findById(mortalityRate.getId());
+            if (existingMRate == null) {
+                throw new ResourceNotFoundException("Mortality Rate with id: " + mortalityRate.getId() + " was not found");
+            }
+        });
+
         repository.deleteAll(records);
     }
 
     public void deleteRecordsByYear(int year) {
         List<MortalityRate> records = repository.findByYear(year);
-        this.deleteAll(records);
-    }
 
-    public void saveAllRecords(List<MortalityRate> records) {
-        this.saveAll(records);
+        if (records.isEmpty()) {
+            throw new ResourceNotFoundException("There aren't any Mortality Rate entries for the provided year:" + year);
+        }
+
+        this.deleteAll(records);
     }
 }

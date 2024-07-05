@@ -1,9 +1,13 @@
 package com.martim.lima.exercicio.utils;
 
+import lombok.AccessLevel;
+import lombok.NoArgsConstructor;
+
 import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
 
+@NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class CountryCodeUtils {
 
     // A map to store country names and their corresponding country codes

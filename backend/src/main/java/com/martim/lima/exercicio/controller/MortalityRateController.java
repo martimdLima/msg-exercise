@@ -4,9 +4,11 @@ package com.martim.lima.exercicio.controller;
 import com.martim.lima.exercicio.exceptions.GeneralException;
 import com.martim.lima.exercicio.exceptions.InvalidCSVException;
 import com.martim.lima.exercicio.exceptions.ParsingCSVException;
+import com.martim.lima.exercicio.exceptions.ResourceNotFoundException;
 import com.martim.lima.exercicio.models.MortalityRate;
 import com.martim.lima.exercicio.service.INEStatisticsService;
 import com.martim.lima.exercicio.service.MortalityRateService;
+import com.martim.lima.exercicio.wrappers.ApiResponse;
 import com.martim.lima.exercicio.wrappers.AvailableYearsResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -49,23 +51,50 @@ public class MortalityRateController {
 
     @GetMapping("/search/id/{id}")
     public MortalityRate getById(@PathVariable long id) {
-        return mortalityRateService.findById(id);
+        MortalityRate result = mortalityRateService.findById(id);
+        if (result == null) {
+            throw new ResourceNotFoundException("Mortality Rate not found with id: " + id);
+        }
+
+        return result;
     }
 
     @GetMapping("/search/year/{year}")
     public List<MortalityRate> getByYear(@PathVariable int year) {
-        return mortalityRateService.findByYear(year);
+        List<MortalityRate> result = mortalityRateService.findByYear(year);
+
+        if (result.isEmpty()) {
+            throw new ResourceNotFoundException("No Mortality Rates found for year: " + year);
+        }
+
+        return result;
+    }
+
+    @GetMapping("/search/country/{country}")
+    public List<MortalityRate> getByCountry(@PathVariable String country) {
+        List<MortalityRate> result = mortalityRateService.findByCountry(country);
+
+        if (result.isEmpty()) {
+            throw new ResourceNotFoundException("No Mortality Rates found for country: " + country);
+        }
+
+        return result;
     }
 
     @GetMapping("/search/year/{year}/country/{country}")
     public MortalityRate getByYearAndCountry(@PathVariable int year,
                                          @PathVariable String country) {
-        return mortalityRateService.findByYearAndCountry(year, country);
+        MortalityRate result = mortalityRateService.findByYearAndCountry(year, country);
+        if (result == null) {
+            throw new ResourceNotFoundException("Mortality Rate not found with year: " + year + " country: " + country);
+        }
+        return result;
     }
 
     @PostMapping("/save")
     public ResponseEntity<MortalityRate> save(@RequestBody MortalityRate mortalityRate) {
-        Map<String, Long> populationNumbers = ineStatisticsService.getMaleAndFemalePopulation(mortalityRate.getYear());
+        Map<String, Long> populationNumbers = ineStatisticsService.getPopulationDataByCountry(mortalityRate.getYear(),
+                mortalityRate.getCountry());
         mortalityRate.setMalePopulation(populationNumbers.get("M"));
         mortalityRate.setFemalePopulation(populationNumbers.get("F"));
         MortalityRate saveMortalityRateRecord = mortalityRateService.save(mortalityRate);
@@ -78,7 +107,7 @@ public class MortalityRateController {
         return new ResponseEntity<>(updateMortalityRateRecord, HttpStatus.OK);
     }
     @PostMapping("/upload")
-    public void uploadCsv(@RequestParam("file") MultipartFile file, @RequestParam int year) {
+    public ResponseEntity<ApiResponse> uploadCsv(@RequestParam("file") MultipartFile file, @RequestParam int year) {
         try (BufferedReader reader = new BufferedReader(new InputStreamReader(file.getInputStream()))) {
             String line;
             List<MortalityRate> records = new ArrayList<>();
@@ -99,7 +128,10 @@ public class MortalityRateController {
                 counter++;
             }
             mortalityRateService.deleteRecordsByYear(year);
-            mortalityRateService.saveAllRecords(records);
+            mortalityRateService.saveAll(records);
+
+            ApiResponse response = new ApiResponse(HttpStatus.OK.value(), HttpStatus.OK.name(), "CSV upload successful and data saved for year " + year);
+            return ResponseEntity.ok(response);
         } catch (IOException e) {
             throw new ParsingCSVException("Error reading the file: " + e.getMessage());
         } catch (Exception e) {
@@ -107,7 +139,7 @@ public class MortalityRateController {
         }
     }
 
-    private static MortalityRate buildMortalityRateFromCsv(Integer year, String country, String[] data, Map<String, Long> populationNumbers) {
+    private MortalityRate buildMortalityRateFromCsv(Integer year, String country, String[] data, Map<String, Long> populationNumbers) {
         double maleRate;
         double femaleRate;
 
